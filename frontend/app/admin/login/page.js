@@ -107,7 +107,7 @@ export default function AdminLogin() {
         </form>
 
         <p className="text-sm text-center text-gray-700 mt-4">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link
             href="/admin/signup"
             className="text-blue-700 font-semibold hover:underline"
