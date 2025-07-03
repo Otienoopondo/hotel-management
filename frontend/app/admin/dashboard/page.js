@@ -37,10 +37,9 @@ export default function AdminDashboard() {
 
   const fetchHotels = async (token) => {
     try {
-      const res = await fetch('http://localhost:5000/api/hotels', {
+      const res = await fetch('https://hotel-management-backend-9459.onrender.com/api/hotels', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Failed to fetch hotels');
       const data = await res.json();
       setHotels(data);
     } catch {
@@ -50,10 +49,9 @@ export default function AdminDashboard() {
 
   const fetchStaff = async (token) => {
     try {
-      const res = await fetch('http://localhost:5000/api/staff', {
+      const res = await fetch('https://hotel-management-backend-9459.onrender.com/api/staff', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Failed to fetch staff');
       const data = await res.json();
       setStaffList(data);
     } catch {
@@ -68,7 +66,9 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem('adminToken');
       const method = editHotelId ? 'PUT' : 'POST';
-      const url = editHotelId ? `http://localhost:5000/api/hotels/${editHotelId}` : 'http://localhost:5000/api/hotels';
+      const url = editHotelId
+        ? `https://hotel-management-backend-9459.onrender.com/api/hotels/${editHotelId}`
+        : 'https://hotel-management-backend-9459.onrender.com/api/hotels';
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -93,7 +93,9 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem('adminToken');
       const method = editStaffId ? 'PUT' : 'POST';
-      const url = editStaffId ? `http://localhost:5000/api/staff/${editStaffId}` : 'http://localhost:5000/api/staff';
+      const url = editStaffId
+        ? `https://hotel-management-backend-9459.onrender.com/api/staff/${editStaffId}`
+        : 'https://hotel-management-backend-9459.onrender.com/api/staff';
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -131,7 +133,7 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem('adminToken');
       const endpoint = confirmDelete.type === 'hotel' ? 'hotels' : 'staff';
-      const res = await fetch(`http://localhost:5000/api/${endpoint}/${confirmDelete.id}`, {
+      const res = await fetch(`https://hotel-management-backend-9459.onrender.com/api/${endpoint}/${confirmDelete.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -156,110 +158,128 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className={`flex flex-col min-h-screen transition duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'}`}>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <div className="flex items-center gap-3">
+          <button onClick={toggleMode} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+            {darkMode ? <Sun /> : <Moon />}
+          </button>
+          <button onClick={logout} className="p-2 rounded-full hover:bg-red-100 text-red-500 dark:hover:bg-red-800">
+            <LogOut />
+          </button>
+        </div>
+      </div>
+
       {message && (
-        <div className="fixed top-4 right-4 z-50 bg-green-600 text-white px-4 py-2 rounded shadow-md">{message}</div>
+        <div className="bg-green-200 text-green-800 px-4 py-2 rounded mb-4">{message}</div>
       )}
 
-      <header className="p-4 flex justify-between items-center bg-black/70 text-white">
-        <h1 className="text-lg font-semibold">Admin Dashboard</h1>
-        <div className="flex gap-4">
-          <button onClick={toggleMode}>{darkMode ? <Sun /> : <Moon />}</button>
-          <button onClick={logout} className="flex items-center gap-1 hover:text-yellow-400"><LogOut size={18} />Logout</button>
-        </div>
-      </header>
+      <div className="flex gap-4 mb-6">
+        <button
+          onClick={() => setActiveTab('hotels')}
+          className={`px-4 py-2 rounded ${activeTab === 'hotels' ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-700'}`}
+        >
+          Hotels
+        </button>
+        <button
+          onClick={() => setActiveTab('staff')}
+          className={`px-4 py-2 rounded ${activeTab === 'staff' ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-700'}`}
+        >
+          Staff
+        </button>
+      </div>
 
-      <main className="p-4">
-        <div className="flex gap-4 mb-4">
-          <button onClick={() => setActiveTab('hotels')} className={`px-4 py-2 rounded ${activeTab === 'hotels' ? 'bg-blue-600 text-white' : 'bg-white text-black'}`}>Manage Hotels</button>
-          <button onClick={() => setActiveTab('staff')} className={`px-4 py-2 rounded ${activeTab === 'staff' ? 'bg-green-600 text-white' : 'bg-white text-black'}`}>Manage Staff</button>
-        </div>
-
-        <div className="flex gap-4 mb-6">
-          <button onClick={() => setShowHotelForm(true)} className="bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-2"><Plus size={16} /> Add Hotel</button>
-          <button onClick={() => setShowStaffForm(true)} className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"><Plus size={16} /> Add Staff</button>
-        </div>
-
-        {loading ? (
-          <p className="text-center text-sm text-gray-500">Loading...</p>
-        ) : activeTab === 'hotels' ? (
-          <section>
-            <h2 className="text-xl font-bold mb-4">Hotels ({hotels.length})</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {hotels.map((h) => (
-                <div key={h._id} className="bg-white dark:bg-gray-800 shadow-md p-4 rounded-lg text-black dark:text-white transition hover:shadow-lg">
-                  <Image src={h.image || '/hotel-placeholder.jpg'} alt={h.name} width={400} height={200} className="w-full h-40 object-cover rounded" />
-                  <h3 className="text-lg font-semibold mt-2">{h.name}</h3>
-                  <p className="text-sm">{h.description}</p>
-                  <p className="font-bold">KES {h.price}</p>
-                  <div className="flex gap-3 mt-2">
-                    <button onClick={() => editHotel(h)} className="text-blue-600 flex items-center gap-1"><Edit size={16} />Edit</button>
-                    <button onClick={() => confirmRemove('hotel', h._id)} className="text-red-600 flex items-center gap-1"><Trash size={16} />Remove</button>
-                  </div>
-                </div>
-              ))}
+      {activeTab === 'hotels' && (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Hotel Listings</h2>
+            <button onClick={() => setShowHotelForm(true)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded">
+              <Plus size={16} /> Add Hotel
+            </button>
+          </div>
+          {showHotelForm && (
+            <div className="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6">
+              <div className="flex justify-between mb-2">
+                <h3 className="font-semibold">{editHotelId ? 'Edit Hotel' : 'Add New Hotel'}</h3>
+                <button onClick={() => { setShowHotelForm(false); setEditHotelId(null); }}><X /></button>
+              </div>
+              <input type="text" placeholder="Name" value={hotelForm.name} onChange={(e) => setHotelForm({ ...hotelForm, name: e.target.value })} className="w-full p-2 mb-2 rounded" />
+              <input type="number" placeholder="Price" value={hotelForm.price} onChange={(e) => setHotelForm({ ...hotelForm, price: e.target.value })} className="w-full p-2 mb-2 rounded" />
+              <input type="text" placeholder="Image URL" value={hotelForm.image} onChange={(e) => setHotelForm({ ...hotelForm, image: e.target.value })} className="w-full p-2 mb-2 rounded" />
+              <textarea placeholder="Description" value={hotelForm.description} onChange={(e) => setHotelForm({ ...hotelForm, description: e.target.value })} className="w-full p-2 mb-2 rounded" />
+              <button onClick={handleAddHotel} className="bg-green-600 text-white px-4 py-2 rounded">
+                {editHotelId ? 'Update Hotel' : 'Add Hotel'}
+              </button>
             </div>
-          </section>
-        ) : (
-          <section>
-            <h2 className="text-xl font-bold mb-4">Staff Members ({staffList.length})</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {staffList.map((s) => (
-                <div key={s._id} className="bg-white dark:bg-gray-800 shadow-md p-4 rounded-lg text-black dark:text-white transition hover:shadow-lg">
-                  <h3 className="text-lg font-semibold">{s.name}</h3>
-                  <p>{s.email}</p>
-                  <p>{s.phone}</p>
-                  <div className="flex gap-3 mt-2">
-                    <button onClick={() => editStaff(s)} className="text-blue-600 flex items-center gap-1"><Edit size={16} />Edit</button>
-                    <button onClick={() => confirmRemove('staff', s._id)} className="text-red-600 flex items-center gap-1"><Trash size={16} />Remove</button>
-                  </div>
+          )}
+          <div className="grid md:grid-cols-2 gap-4">
+            {hotels.map(hotel => (
+              <div key={hotel._id} className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+                <Image src={hotel.image} alt={hotel.name} width={400} height={200} className="rounded mb-2 object-cover" />
+                <h3 className="font-bold">{hotel.name}</h3>
+                <p>${hotel.price}</p>
+                <p className="text-sm">{hotel.description}</p>
+                <div className="flex gap-2 mt-2">
+                  <button onClick={() => editHotel(hotel)} className="p-1 bg-yellow-300 rounded"><Edit size={16} /></button>
+                  <button onClick={() => confirmRemove('hotel', hotel._id)} className="p-1 bg-red-300 rounded"><Trash size={16} /></button>
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
-      </main>
-
-      <footer className="bg-black/70 text-white text-center py-4 mt-auto text-sm">&copy; {new Date().getFullYear()} Hotel Management System</footer>
-
-      {/* Add/Edit Modals */}
-      {showHotelForm && (
-        <FormModal title={editHotelId ? 'Edit Hotel' : 'Add Hotel'} form={hotelForm} setForm={setHotelForm} onClose={() => { setShowHotelForm(false); setEditHotelId(null); }} onSave={handleAddHotel} fields={[{ name: 'name', placeholder: 'Hotel Name' }, { name: 'price', placeholder: 'Price' }, { name: 'image', placeholder: 'Image URL or Path' }, { name: 'description', placeholder: 'Description', isTextarea: true }]} />
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
-      {showStaffForm && (
-        <FormModal title={editStaffId ? 'Edit Staff' : 'Add Staff'} form={staffForm} setForm={setStaffForm} onClose={() => { setShowStaffForm(false); setEditStaffId(null); }} onSave={handleAddStaff} fields={[{ name: 'name', placeholder: 'Name' }, { name: 'email', placeholder: 'Email' }, { name: 'phone', placeholder: 'Phone' }, { name: 'password', placeholder: 'Password', type: 'password' }]} />
+      {activeTab === 'staff' && (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Staff Members</h2>
+            <button onClick={() => setShowStaffForm(true)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded">
+              <Plus size={16} /> Add Staff
+            </button>
+          </div>
+          {showStaffForm && (
+            <div className="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6">
+              <div className="flex justify-between mb-2">
+                <h3 className="font-semibold">{editStaffId ? 'Edit Staff' : 'Add New Staff'}</h3>
+                <button onClick={() => { setShowStaffForm(false); setEditStaffId(null); }}><X /></button>
+              </div>
+              <input type="text" placeholder="Name" value={staffForm.name} onChange={(e) => setStaffForm({ ...staffForm, name: e.target.value })} className="w-full p-2 mb-2 rounded" />
+              <input type="email" placeholder="Email" value={staffForm.email} onChange={(e) => setStaffForm({ ...staffForm, email: e.target.value })} className="w-full p-2 mb-2 rounded" />
+              <input type="text" placeholder="Phone" value={staffForm.phone} onChange={(e) => setStaffForm({ ...staffForm, phone: e.target.value })} className="w-full p-2 mb-2 rounded" />
+              <input type="password" placeholder="Password" value={staffForm.password} onChange={(e) => setStaffForm({ ...staffForm, password: e.target.value })} className="w-full p-2 mb-2 rounded" />
+              <button onClick={handleAddStaff} className="bg-green-600 text-white px-4 py-2 rounded">
+                {editStaffId ? 'Update Staff' : 'Add Staff'}
+              </button>
+            </div>
+          )}
+          <div className="grid md:grid-cols-2 gap-4">
+            {staffList.map(staff => (
+              <div key={staff._id} className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+                <h3 className="font-bold">{staff.name}</h3>
+                <p>{staff.email}</p>
+                <p>{staff.phone}</p>
+                <div className="flex gap-2 mt-2">
+                  <button onClick={() => editStaff(staff)} className="p-1 bg-yellow-300 rounded"><Edit size={16} /></button>
+                  <button onClick={() => confirmRemove('staff', staff._id)} className="p-1 bg-red-300 rounded"><Trash size={16} /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {confirmDelete.show && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded shadow text-black dark:text-white">
-            <h3 className="text-xl font-semibold mb-4">Confirm Deletion</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded shadow-lg text-center">
             <p>Are you sure you want to delete this {confirmDelete.type}?</p>
-            <div className="flex justify-end gap-4 mt-6">
-              <button onClick={executeRemove} className="bg-red-600 text-white px-4 py-2 rounded">Delete</button>
-              <button onClick={() => setConfirmDelete({ show: false, type: null, id: null })} className="bg-gray-400 px-4 py-2 rounded">Cancel</button>
+            <div className="mt-4 flex justify-center gap-4">
+              <button onClick={executeRemove} className="bg-red-600 text-white px-4 py-2 rounded">Yes</button>
+              <button onClick={() => setConfirmDelete({ show: false, type: null, id: null })} className="bg-gray-400 px-4 py-2 rounded">No</button>
             </div>
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-function FormModal({ title, form, setForm, onClose, onSave, fields }) {
-  return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 text-black dark:text-white p-6 rounded shadow-lg w-[90%] max-w-md relative">
-        <button className="absolute top-2 right-2 hover:text-red-600" onClick={onClose} aria-label="Close form"><X /></button>
-        <h3 className="text-xl font-bold mb-4">{title}</h3>
-        {fields.map(({ name, placeholder, type = 'text', isTextarea }) => isTextarea ? (
-          <textarea key={name} value={form[name]} onChange={(e) => setForm({ ...form, [name]: e.target.value })} placeholder={placeholder} className="w-full mb-2 p-2 border rounded bg-white dark:bg-gray-700 text-black dark:text-white" />
-        ) : (
-          <input key={name} type={type} value={form[name]} onChange={(e) => setForm({ ...form, [name]: e.target.value })} placeholder={placeholder} className="w-full mb-2 p-2 border rounded bg-white dark:bg-gray-700 text-black dark:text-white" />
-        ))}
-        <button onClick={onSave} className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mt-2">Save</button>
-      </div>
     </div>
   );
 }

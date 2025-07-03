@@ -18,6 +18,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+
 export default function StaffDashboard() {
   const [modal, setModal] = useState(null);
   const [staff, setStaff] = useState(null);
@@ -37,17 +39,17 @@ export default function StaffDashboard() {
 
     try {
       if (type === "bookings") {
-        const res = await axios.get("http://localhost:5000/api/bookings", {
+        const res = await axios.get(`${API_BASE}/api/bookings`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setBookings(res.data);
       }
       if (type === "services") {
-        const res = await axios.get("http://localhost:5000/api/services/orders");
+        const res = await axios.get(`${API_BASE}/api/services/orders`);
         setOrders(res.data);
       }
       if (type === "clients") {
-        const res = await axios.get("http://localhost:5000/api/client", {
+        const res = await axios.get(`${API_BASE}/api/client`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setClients(res.data);
@@ -89,21 +91,21 @@ export default function StaffDashboard() {
 
     try {
       if (confirmDelete.type === "booking") {
-        await axios.delete(`http://localhost:5000/api/bookings/${confirmDelete.id}`, {
+        await axios.delete(`${API_BASE}/api/bookings/${confirmDelete.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setBookings((prev) => prev.filter((b) => b._id !== confirmDelete.id));
         toast.success("✅ Booking deleted");
       }
       if (confirmDelete.type === "client") {
-        await axios.delete(`http://localhost:5000/api/client/${confirmDelete.id}`, {
+        await axios.delete(`${API_BASE}/api/client/${confirmDelete.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setClients((prev) => prev.filter((c) => c._id !== confirmDelete.id));
         toast.success("✅ Client deleted");
       }
       if (confirmDelete.type === "order") {
-        await axios.delete(`http://localhost:5000/api/services/orders/${confirmDelete.id}`, {
+        await axios.delete(`${API_BASE}/api/services/orders/${confirmDelete.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setOrders((prev) => prev.filter((o) => o._id !== confirmDelete.id));
@@ -123,10 +125,11 @@ export default function StaffDashboard() {
       style={{ backgroundImage: "url('/sdashboard.jpg')" }}
     >
       <div className="absolute inset-0 bg-black/60 z-0" />
-
       <div className="relative z-10 flex-1 p-4 sm:p-10">
         <header className="mb-8 text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2">Welcome{staff?.name ? `, ${staff.name}` : ""}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+            Welcome{staff?.name ? `, ${staff.name}` : ""}
+          </h1>
           <nav className="flex flex-wrap justify-center gap-4 text-sm sm:text-base">
             <Link href="/" className="hover:text-yellow-400 flex items-center gap-1">
               <Home size={18} /> Home
@@ -256,7 +259,10 @@ export default function StaffDashboard() {
 
             {(modal === "bookings" || modal === "services" || modal === "clients") && (
               <div className="mt-6 flex gap-4">
-                <button onClick={() => downloadReport(modal, modal === "bookings" ? bookings : modal === "services" ? orders : clients)} className="bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2">
+                <button
+                  onClick={() => downloadReport(modal, modal === "bookings" ? bookings : modal === "services" ? orders : clients)}
+                  className="bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+                >
                   <Download size={16} /> Download Report
                 </button>
                 <button onClick={() => window.print()} className="bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2">
@@ -271,7 +277,9 @@ export default function StaffDashboard() {
       {confirmDelete.type && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="bg-white text-black p-6 rounded-lg max-w-sm w-full">
-            <p className="text-lg font-semibold mb-4">Are you sure you want to delete this {confirmDelete.type}?</p>
+            <p className="text-lg font-semibold mb-4">
+              Are you sure you want to delete this {confirmDelete.type}?
+            </p>
             <div className="flex justify-end gap-4">
               <button onClick={() => setConfirmDelete({ type: null, id: null })} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>
               <button onClick={confirmAndDelete} className="px-4 py-2 bg-red-600 text-white rounded">Delete</button>

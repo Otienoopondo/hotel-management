@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 import React, { useState } from "react";
 import Link from "next/link";
-import axios from "../../../utils/axios";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -23,7 +23,10 @@ export default function AdminLogin() {
     setIsError(false);
 
     try {
-      const res = await axios.post("/admin/login", formData);
+      const res = await axios.post(
+        "https://hotel-management-backend-9459.onrender.com/api/admin/login",
+        formData
+      );
       localStorage.setItem("adminToken", res.data.token);
       setIsError(false);
       setMessage("✅ Login successful! Redirecting...");
@@ -60,7 +63,9 @@ export default function AdminLogin() {
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-700">Email Address</label>
+            <label className="block mb-1 text-sm font-semibold text-gray-700">
+              Email Address
+            </label>
             <input
               type="email"
               name="email"
@@ -73,7 +78,9 @@ export default function AdminLogin() {
           </div>
 
           <div className="relative">
-            <label className="block mb-1 text-sm font-semibold text-gray-700">Password</label>
+            <label className="block mb-1 text-sm font-semibold text-gray-700">
+              Password
+            </label>
             <input
               type={showPassword ? "text" : "password"}
               name="password"
@@ -101,7 +108,10 @@ export default function AdminLogin() {
 
         <p className="text-sm text-center text-gray-700 mt-4">
           Don't have an account?{" "}
-          <Link href="/admin/signup" className="text-blue-700 font-semibold hover:underline">
+          <Link
+            href="/admin/signup"
+            className="text-blue-700 font-semibold hover:underline"
+          >
             Sign up here
           </Link>
         </p>

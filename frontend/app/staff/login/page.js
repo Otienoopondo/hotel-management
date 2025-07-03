@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 export default function StaffLogin() {
   const [form, setForm] = useState({ email: '', password: '' });
-  const [message, setMessage] = useState(null); // for both success & error
+  const [message, setMessage] = useState(null);
   const [isError, setIsError] = useState(false);
   const router = useRouter();
 
@@ -20,7 +20,7 @@ export default function StaffLogin() {
     setIsError(false);
 
     try {
-      const res = await axios.post('/staff/login', form);
+      const res = await axios.post('/staff/login', form); // ✅ dynamic baseURL via axios instance
       localStorage.setItem('staffToken', res.data.token);
       setMessage('✅ Login successful! Redirecting to dashboard...');
       setTimeout(() => router.push('/staff/dashboard'), 2500);

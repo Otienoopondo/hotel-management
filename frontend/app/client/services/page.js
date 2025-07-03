@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import axios from "@/utils/axios";
 import {
   FaConciergeBell, FaArrowLeft, FaSwimmingPool, FaUtensils, FaSpa,
   FaShuttleVan, FaDumbbell, FaWifi, FaHome, FaTimes
@@ -23,30 +23,50 @@ export default function HotelServices() {
   const [activeModal, setActiveModal] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [errorToast, setErrorToast] = useState(false);
+  const [token, setToken] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({ show: false, onConfirm: null });
   const router = useRouter();
 
-  const handleSubmit = async (e, orderData) => {
+  useEffect(() => {
+    const storedToken = localStorage.getItem("clientToken");
+    if (!storedToken) {
+      router.push("/client/login");
+    } else {
+      setToken(storedToken);
+    }
+  }, [router]);
+
+  const handleSubmit = (e, orderData) => {
     e.preventDefault();
 
-    try {
-      await axios.post("http://localhost:5000/api/services/order", {
-        serviceType: activeModal,
-        ...orderData,
-      });
+    setConfirmModal({
+      show: true,
+      onConfirm: async () => {
+        try {
+          await axios.post("/services/order", {
+            serviceType: activeModal,
+            ...orderData,
+          }, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
 
-      setShowToast(true);
-      setErrorToast(false);
-    } catch (error) {
-      console.error("Error submitting order:", error.response?.data || error.message);
-      setShowToast(false);
-      setErrorToast(true);
-    }
+          setShowToast(true);
+          setErrorToast(false);
+        } catch (error) {
+          console.error("Error submitting order:", error.response?.data || error.message);
+          setShowToast(false);
+          setErrorToast(true);
+        }
+      }
+    });
   };
 
   useEffect(() => {
     if (showToast || errorToast) {
       const timer = setTimeout(() => {
-        if (showToast) setActiveModal(null); // Close only on success
+        if (showToast) setActiveModal(null);
         setShowToast(false);
         setErrorToast(false);
       }, 3000);
@@ -236,6 +256,31 @@ export default function HotelServices() {
               <FaTimes size={20} />
             </button>
             {renderModalContent()}
+          </div>
+        </div>
+      )}
+
+      {confirmModal.show && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] px-4">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl text-center">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Are you sure you want to request this service?</h3>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => {
+                  confirmModal.onConfirm();
+                  setConfirmModal({ show: false, onConfirm: null });
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setConfirmModal({ show: false, onConfirm: null })}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+              >
+                No
+              </button>
+            </div>
           </div>
         </div>
       )}

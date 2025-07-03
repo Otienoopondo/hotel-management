@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import axios from "../../../utils/axios";
+import axios from "axios"; // ✅ using default axios instead of custom
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -36,7 +36,10 @@ export default function AdminSignup() {
 
     try {
       const { name, email, phone, password } = formData;
-      await axios.post("/admin/signup", { name, email, phone, password });
+      await axios.post(
+        "https://hotel-management-backend-9459.onrender.com/api/admin/signup",
+        { name, email, phone, password }
+      );
       setIsError(false);
       setMessage("✅ Signup successful! Redirecting...");
       setTimeout(() => router.push("/admin/login"), 2500);
@@ -72,7 +75,9 @@ export default function AdminSignup() {
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-700">Full Name</label>
+            <label className="block mb-1 text-sm font-semibold text-gray-700">
+              Full Name
+            </label>
             <input
               type="text"
               name="name"
@@ -85,7 +90,9 @@ export default function AdminSignup() {
           </div>
 
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-700">Email Address</label>
+            <label className="block mb-1 text-sm font-semibold text-gray-700">
+              Email Address
+            </label>
             <input
               type="email"
               name="email"
@@ -98,7 +105,9 @@ export default function AdminSignup() {
           </div>
 
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-700">Phone Number</label>
+            <label className="block mb-1 text-sm font-semibold text-gray-700">
+              Phone Number
+            </label>
             <input
               type="tel"
               name="phone"
@@ -111,7 +120,9 @@ export default function AdminSignup() {
           </div>
 
           <div className="relative">
-            <label className="block mb-1 text-sm font-semibold text-gray-700">Password</label>
+            <label className="block mb-1 text-sm font-semibold text-gray-700">
+              Password
+            </label>
             <input
               type={showPassword ? "text" : "password"}
               name="password"
@@ -130,7 +141,9 @@ export default function AdminSignup() {
           </div>
 
           <div className="relative">
-            <label className="block mb-1 text-sm font-semibold text-gray-700">Confirm Password</label>
+            <label className="block mb-1 text-sm font-semibold text-gray-700">
+              Confirm Password
+            </label>
             <input
               type={showConfirm ? "text" : "password"}
               name="confirmPassword"
@@ -158,7 +171,10 @@ export default function AdminSignup() {
 
         <p className="text-sm text-center text-gray-700 mt-4">
           Already have an account?{" "}
-          <Link href="/admin/login" className="text-blue-700 font-semibold hover:underline">
+          <Link
+            href="/admin/login"
+            className="text-blue-700 font-semibold hover:underline"
+          >
             Login here
           </Link>
         </p>
