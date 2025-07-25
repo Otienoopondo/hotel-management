@@ -29,6 +29,7 @@ export default function StaffDashboard() {
   const [confirmDelete, setConfirmDelete] = useState({ type: null, id: null });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const token = typeof window !== "undefined" ? localStorage.getItem("staffToken") : null;
 
@@ -45,7 +46,9 @@ export default function StaffDashboard() {
         setBookings(res.data);
       }
       if (type === "services") {
-        const res = await axios.get(`${API_BASE}/api/services/orders`);
+        const res = await axios.get(`${API_BASE}/api/services/orders`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setOrders(res.data);
       }
       if (type === "clients") {
@@ -57,12 +60,16 @@ export default function StaffDashboard() {
     } catch (err) {
       console.error("Load error:", err);
       setError("Failed to load data.");
+      toast.error("Failed to load data");
     }
 
     setLoading(false);
   };
 
-  const closeModal = () => setModal(null);
+  const closeModal = () => {
+    setModal(null);
+    setConfirmDelete({ type: null, id: null });
+  };
 
   useEffect(() => {
     const stored = localStorage.getItem("staff");
@@ -89,34 +96,40 @@ export default function StaffDashboard() {
   const confirmAndDelete = async () => {
     if (!confirmDelete.type || !confirmDelete.id) return;
 
+    setIsDeleting(true);
     try {
       if (confirmDelete.type === "booking") {
         await axios.delete(`${API_BASE}/api/bookings/${confirmDelete.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setBookings((prev) => prev.filter((b) => b._id !== confirmDelete.id));
-        toast.success("✅ Booking deleted");
+        toast.success("Booking deleted successfully");
       }
-      if (confirmDelete.type === "client") {
+      else if (confirmDelete.type === "client") {
         await axios.delete(`${API_BASE}/api/client/${confirmDelete.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setClients((prev) => prev.filter((c) => c._id !== confirmDelete.id));
-        toast.success("✅ Client deleted");
+        toast.success("Client deleted successfully");
       }
-      if (confirmDelete.type === "order") {
+      else if (confirmDelete.type === "order") {
         await axios.delete(`${API_BASE}/api/services/orders/${confirmDelete.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setOrders((prev) => prev.filter((o) => o._id !== confirmDelete.id));
-        toast.success("✅ Order deleted");
+        toast.success("Order deleted successfully");
       }
     } catch (error) {
       console.error("Delete error:", error);
-      toast.error("❌ Failed to delete");
+      toast.error("Contact admin to delete this record");
     } finally {
+      setIsDeleting(false);
       setConfirmDelete({ type: null, id: null });
     }
+  };
+
+  const handleDeleteClick = (type, id) => {
+    setConfirmDelete({ type, id });
   };
 
   return (
@@ -165,19 +178,28 @@ export default function StaffDashboard() {
         </div>
 
         <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <button onClick={() => openModal("bookings")} className="bg-white/10 p-6 rounded-xl shadow hover:bg-white/20 transition">
+          <button 
+            onClick={() => openModal("bookings")} 
+            className="bg-white/10 p-6 rounded-xl shadow hover:bg-white/20 transition"
+          >
             <h2 className="text-xl font-bold flex items-center gap-2">
               <BookOpen size={22} /> View Bookings
             </h2>
             <p className="text-sm text-gray-300 mt-1">Manage room bookings.</p>
           </button>
-          <button onClick={() => openModal("services")} className="bg-white/10 p-6 rounded-xl shadow hover:bg-white/20 transition">
+          <button 
+            onClick={() => openModal("services")} 
+            className="bg-white/10 p-6 rounded-xl shadow hover:bg-white/20 transition"
+          >
             <h2 className="text-xl font-bold flex items-center gap-2">
               <ClipboardList size={22} /> View Service Orders
             </h2>
             <p className="text-sm text-gray-300 mt-1">Client service requests.</p>
           </button>
-          <button onClick={() => openModal("clients")} className="bg-white/10 p-6 rounded-xl shadow hover:bg-white/20 transition">
+          <button 
+            onClick={() => openModal("clients")} 
+            className="bg-white/10 p-6 rounded-xl shadow hover:bg-white/20 transition"
+          >
             <h2 className="text-xl font-bold flex items-center gap-2">
               <Users size={22} /> Manage Clients
             </h2>
@@ -203,8 +225,12 @@ export default function StaffDashboard() {
               {modal === "clients" && "Clients"}
             </h2>
 
-            {loading && <p className="text-gray-600">Loading...</p>}
-            {error && <p className="text-red-600">{error}</p>}
+            {loading && (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            )}
+            {error && <p className="text-red-600 py-4">{error}</p>}
 
             {modal === "profile" && staff && (
               <div className="space-y-2 text-sm">
@@ -214,7 +240,7 @@ export default function StaffDashboard() {
               </div>
             )}
 
-            {modal === "bookings" && bookings.map((b) => (
+            {modal === "bookings" && !loading && bookings.map((b) => (
               <div key={b._id} className="p-4 bg-gray-100 rounded mb-2 text-sm">
                 <p><strong>Name:</strong> {b.name}</p>
                 <p><strong>Email:</strong> {b.email}</p>
@@ -222,50 +248,59 @@ export default function StaffDashboard() {
                 <p><strong>Check-in:</strong> {new Date(b.checkIn).toLocaleDateString()}</p>
                 <p><strong>Check-out:</strong> {new Date(b.checkOut).toLocaleDateString()}</p>
                 <div className="flex justify-end mt-2 gap-2">
-                  <button onClick={() => setConfirmDelete({ type: "booking", id: b._id })} className="bg-red-500 text-white px-3 py-1 rounded text-xs">
+                  <button 
+                    onClick={() => handleDeleteClick("booking", b._id)} 
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs flex items-center gap-1"
+                  >
                     <Trash2 size={14} /> Delete
                   </button>
                 </div>
               </div>
             ))}
 
-            {modal === "services" && orders.map((o) => (
+            {modal === "services" && !loading && orders.map((o) => (
               <div key={o._id} className="p-4 bg-gray-100 rounded mb-2 text-sm">
                 <p><strong>Name:</strong> {o.clientName}</p>
                 <p><strong>Room:</strong> {o.roomNumber}</p>
                 <p><strong>Service:</strong> {o.serviceType}</p>
                 <p><strong>Details:</strong> {o.details}</p>
                 <p><strong>Date:</strong> {new Date(o.createdAt).toLocaleString()}</p>
-                <div className="flex justify-end mt-2">
-                  <button onClick={() => setConfirmDelete({ type: "order", id: o._id })} className="bg-red-500 text-white px-3 py-1 rounded text-xs">
+                <div className="flex justify-end mt-2 gap-2">
+                  <button 
+                    onClick={() => handleDeleteClick("order", o._id)} 
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs flex items-center gap-1"
+                  >
                     <Trash2 size={14} /> Delete
                   </button>
                 </div>
               </div>
             ))}
 
-            {modal === "clients" && clients.map((c) => (
+            {modal === "clients" && !loading && clients.map((c) => (
               <div key={c._id} className="p-4 bg-gray-100 rounded mb-2 text-sm">
                 <p><strong>Name:</strong> {c.name}</p>
                 <p><strong>Email:</strong> {c.email}</p>
                 <p><strong>Phone:</strong> {c.phone}</p>
-                <div className="flex justify-end mt-2">
-                  <button onClick={() => setConfirmDelete({ type: "client", id: c._id })} className="bg-red-500 text-white px-3 py-1 rounded text-xs">
+                <div className="flex justify-end mt-2 gap-2">
+                  <button 
+                    onClick={() => handleDeleteClick("client", c._id)} 
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs flex items-center gap-1"
+                  >
                     <Trash2 size={14} /> Delete
                   </button>
                 </div>
               </div>
             ))}
 
-            {(modal === "bookings" || modal === "services" || modal === "clients") && (
+            {(modal === "bookings" || modal === "services" || modal === "clients") && !loading && (
               <div className="mt-6 flex gap-4">
                 <button
                   onClick={() => downloadReport(modal, modal === "bookings" ? bookings : modal === "services" ? orders : clients)}
-                  className="bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+                  className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded flex items-center gap-2"
                 >
                   <Download size={16} /> Download Report
                 </button>
-                <button onClick={() => window.print()} className="bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2">
+                <button onClick={() => window.print()} className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded flex items-center gap-2">
                   <Printer size={16} /> Print Report
                 </button>
               </div>
@@ -280,9 +315,29 @@ export default function StaffDashboard() {
             <p className="text-lg font-semibold mb-4">
               Are you sure you want to delete this {confirmDelete.type}?
             </p>
+            <p className="text-sm text-gray-600 mb-4">This action cannot be undone.</p>
             <div className="flex justify-end gap-4">
-              <button onClick={() => setConfirmDelete({ type: null, id: null })} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>
-              <button onClick={confirmAndDelete} className="px-4 py-2 bg-red-600 text-white rounded">Delete</button>
+              <button 
+                onClick={() => setConfirmDelete({ type: null, id: null })} 
+                className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmAndDelete} 
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded flex items-center gap-2"
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete"
+                )}
+              </button>
             </div>
           </div>
         </div>

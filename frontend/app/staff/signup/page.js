@@ -1,139 +1,225 @@
 'use client';
 
 import { useState } from 'react';
-import axios from '@/utils/axios';
 import { useRouter } from 'next/navigation';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import toast, { Toaster } from 'react-hot-toast';
+import Image from 'next/image';
+import axios from '@/utils/axios';
+import {
+  FaHome,
+  FaUser,
+  FaPhone,
+  FaInfoCircle,
+  FaQuestionCircle,
+  FaArrowLeft,
+  FaEnvelope,
+  FaLock,
+  FaSpinner,
+  FaUserTie,
+} from 'react-icons/fa';
 
 export default function StaffSignup() {
-  const [form, setForm] = useState({
+  const router = useRouter();
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
+    staffId: '',
     password: '',
     confirmPassword: '',
-    staffId: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showAbout, setShowAbout] = useState(false);
+  const [showContact, setShowContact] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = e =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    if (form.password !== form.confirmPassword) {
-      toast.error('❌ Passwords do not match');
+    setError('');
+    setLoading(true);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
       return;
     }
 
     try {
       await axios.post('/staff/signup', {
-        name: form.name,
-        email: form.email,
-        phone: form.staffId,
-        password: form.password,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.staffId,
+        password: formData.password,
       });
-      setShowSuccess(true);
-      toast.success('✅ Signup successful! Redirecting...');
-      setTimeout(() => router.push('/staff/login'), 2500);
+      router.push('/staff/login');
     } catch (err) {
-      toast.error(err.response?.data?.message || '❌ Signup failed');
+      setError(err.response?.data?.message || 'Signup failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center">
-      <Toaster position="top-center" />
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+      {/* HEADER */}
+      <header className="bg-gray-800 p-4 shadow-md flex items-center justify-between">
+        <div className="text-xl font-bold flex items-center gap-2">
+          <FaUserTie className="text-green-400" />
+          <span>Staff Signup</span>
+        </div>
+        <nav className="flex gap-4 text-sm">
+          <button onClick={() => router.push('/')} className="hover:text-green-400 flex items-center gap-1"><FaHome />Home</button>
+          <button onClick={() => setShowAbout(true)} className="hover:text-green-400 flex items-center gap-1"><FaInfoCircle />About</button>
+          <button onClick={() => setShowContact(true)} className="hover:text-green-400 flex items-center gap-1"><FaPhone />Contact</button>
+          <button onClick={() => setShowHelp(true)} className="hover:text-green-400 flex items-center gap-1"><FaQuestionCircle />Need Help?</button>
+        </nav>
+      </header>
 
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/ssignup.jpg')" }}
-      />
+      {/* FORM */}
+      <main className="flex flex-col lg:flex-row flex-grow">
+        <div className="lg:w-1/2 p-8 flex flex-col justify-center items-start space-y-6">
+          <h2 className="text-3xl font-bold text-green-400">Create Staff Account</h2>
+          <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+            {error && <p className="text-red-500">{error}</p>}
 
-      <div className="relative z-10 bg-white bg-opacity-90 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md animate-fade-in-up">
-        <h2 className="text-3xl font-bold text-center mb-6 bg-blue-600 text-white py-2 rounded">Staff Signup</h2>
-
-        {showSuccess ? (
-          <div className="bg-green-100 border border-green-400 text-green-700 rounded p-4 text-center font-medium">
-            ✅ Signup Successful! Redirecting to login...
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 text-gray-800">
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email Address"
-              value={form.email}
-              onChange={handleChange}
-              className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
-            <input
-              type="text"
-              name="staffId"
-              placeholder="Staff ID / Phone"
-              value={form.staffId}
-              onChange={handleChange}
-              className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
-            <div className="relative">
+            <div className="flex items-center bg-gray-800 border border-gray-600 rounded px-3">
+              <FaUser className="text-gray-400 mr-2" />
               <input
-                type={showPassword ? 'text' : 'password'}
-                name="password"
-                placeholder="Password"
-                value={form.password}
+                type="text"
+                name="name"
+                placeholder="Name"
+                value={formData.name}
                 onChange={handleChange}
-                className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full py-2 bg-transparent focus:outline-none text-white"
                 required
               />
-              <button
-                type="button"
-                className="absolute right-3 top-3 text-gray-600"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
             </div>
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
+
+            <div className="flex items-center bg-gray-800 border border-gray-600 rounded px-3">
+              <FaEnvelope className="text-gray-400 mr-2" />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full py-2 bg-transparent focus:outline-none text-white"
+                required
+              />
+            </div>
+
+            <div className="flex items-center bg-gray-800 border border-gray-600 rounded px-3">
+              <FaPhone className="text-gray-400 mr-2" />
+              <input
+                type="text"
+                name="staffId"
+                placeholder="Staff ID / Phone"
+                value={formData.staffId}
+                onChange={handleChange}
+                className="w-full py-2 bg-transparent focus:outline-none text-white"
+                required
+              />
+            </div>
+
+            <div className="flex items-center bg-gray-800 border border-gray-600 rounded px-3">
+              <FaLock className="text-gray-400 mr-2" />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full py-2 bg-transparent focus:outline-none text-white"
+                required
+              />
+            </div>
+
+            <div className="flex items-center bg-gray-800 border border-gray-600 rounded px-3">
+              <FaLock className="text-gray-400 mr-2" />
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full py-2 bg-transparent focus:outline-none text-white"
+                required
+              />
+            </div>
+
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white font-semibold p-3 rounded hover:bg-indigo-700 transition-all"
+              disabled={loading}
+              className="w-full bg-green-500 hover:bg-green-600 text-black font-semibold py-2 rounded flex items-center justify-center"
             >
-              Create Account
+              {loading ? (
+                <>
+                  <FaSpinner className="animate-spin mr-2" /> Signing up...
+                </>
+              ) : (
+                'Signup'
+              )}
             </button>
           </form>
-        )}
 
-        {!showSuccess && (
-          <p className="mt-4 text-center text-sm text-gray-700">
+          <p className="text-sm mt-4 text-gray-300">
             Already have an account?{' '}
-            <a href="/staff/login" className="text-indigo-600 font-medium hover:underline">
-              Login
-            </a>
+            <button onClick={() => router.push('/staff/login')} className="text-green-400 underline hover:text-green-300">
+              Log In
+            </button>
           </p>
-        )}
-      </div>
+
+          <button onClick={() => router.back()} className="mt-4 text-sm text-green-300 flex items-center gap-2 hover:text-green-400">
+            <FaArrowLeft /> Back
+          </button>
+        </div>
+
+        {/* IMAGE */}
+        <div className="hidden lg:block lg:w-1/2 relative h-96 lg:h-auto">
+          <Image src="/ssignup.jpg" alt="Staff Signup" layout="fill" objectFit="cover" priority />
+        </div>
+      </main>
+
+      {/* FOOTER */}
+      <footer className="bg-gray-800 text-center p-4 text-sm text-gray-300">
+        &copy; {new Date().getFullYear()} Hotel Management System. All rights reserved.
+      </footer>
+
+      {/* ABOUT MODAL */}
+      {showAbout && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
+          <div className="bg-gray-800 text-white p-6 rounded-lg max-w-md">
+            <h3 className="text-lg font-semibold mb-2">About Us</h3>
+            <p>Our hotel management system enables efficient management for staff with a user-friendly interface.</p>
+            <button onClick={() => setShowAbout(false)} className="mt-4 px-4 py-2 bg-green-500 text-black rounded hover:bg-green-600">Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* CONTACT MODAL */}
+      {showContact && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
+          <div className="bg-gray-800 text-white p-6 rounded-lg max-w-md">
+            <h3 className="text-lg font-semibold mb-2">Contact Us</h3>
+            <p>Email: support@hotelms.com</p>
+            <p>Phone: +254 740 547264</p>
+            <button onClick={() => setShowContact(false)} className="mt-4 px-4 py-2 bg-green-500 text-black rounded hover:bg-green-600">Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* HELP MODAL */}
+      {showHelp && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
+          <div className="bg-gray-800 text-white p-6 rounded-lg max-w-md">
+            <h3 className="text-lg font-semibold mb-2">Need Help?</h3>
+            <p>Ensure all fields are filled and passwords match. Contact support if issues persist.</p>
+            <button onClick={() => setShowHelp(false)} className="mt-4 px-4 py-2 bg-green-500 text-black rounded hover:bg-green-600">Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

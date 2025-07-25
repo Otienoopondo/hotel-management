@@ -21,6 +21,7 @@ import {
   FaQuestionCircle,
   FaBars,
   FaTimes,
+  FaSpinner,
 } from "react-icons/fa";
 
 export default function Home() {
@@ -37,11 +38,35 @@ export default function Home() {
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [isBooking, setIsBooking] = useState(false);
 
   const getRoute = (type) => {
     if (type === "admin") return "/admin/login";
     if (type === "staff") return "/staff/login";
     return "/client/login";
+  };
+
+  const handleLogin = () => {
+    setIsLoggingIn(true);
+    setTimeout(() => {
+      window.location.href = getRoute(role);
+    }, 1000);
+  };
+
+  const handleSignup = () => {
+    setIsSigningUp(true);
+    setTimeout(() => {
+      window.location.href = getRoute(role).replace("login", "signup");
+    }, 1000);
+  };
+
+  const handleBookNow = () => {
+    setIsBooking(true);
+    setTimeout(() => {
+      window.location.href = "/client/signup";
+    }, 1000);
   };
 
   const hotels = [
@@ -125,12 +150,32 @@ export default function Home() {
               <option value="staff">Staff</option>
               <option value="admin">Admin</option>
             </select>
-            <Link href={getRoute(role).replace("login", "signup")} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 inline-flex items-center gap-1">
-              <FaUserPlus /> Sign Up
-            </Link>
-            <Link href={getRoute(role)} className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 inline-flex items-center gap-1">
-              <FaSignInAlt /> Log In
-            </Link>
+            <button 
+              onClick={handleSignup} 
+              disabled={isSigningUp}
+              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 inline-flex items-center gap-1 min-w-[90px] justify-center"
+            >
+              {isSigningUp ? (
+                <FaSpinner className="animate-spin" />
+              ) : (
+                <>
+                  <FaUserPlus /> Sign Up
+                </>
+              )}
+            </button>
+            <button 
+              onClick={handleLogin} 
+              disabled={isLoggingIn}
+              className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 inline-flex items-center gap-1 min-w-[80px] justify-center"
+            >
+              {isLoggingIn ? (
+                <FaSpinner className="animate-spin" />
+              ) : (
+                <>
+                  <FaSignInAlt /> Log In
+                </>
+              )}
+            </button>
             <button onClick={() => setDarkMode(!darkMode)} className="ml-2 px-2 py-1 bg-white text-black rounded hover:bg-yellow-300">
               {darkMode ? <FaSun /> : <FaMoon />}
             </button>
@@ -155,12 +200,32 @@ export default function Home() {
                 <option value="staff">Staff</option>
                 <option value="admin">Admin</option>
               </select>
-              <Link href={getRoute(role).replace("login", "signup")} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 inline-flex items-center gap-1">
-                <FaUserPlus /> Sign Up
-              </Link>
-              <Link href={getRoute(role)} className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 inline-flex items-center gap-1">
-                <FaSignInAlt /> Log In
-              </Link>
+              <button 
+                onClick={handleSignup} 
+                disabled={isSigningUp}
+                className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 inline-flex items-center gap-1 justify-center min-w-[90px]"
+              >
+                {isSigningUp ? (
+                  <FaSpinner className="animate-spin" />
+                ) : (
+                  <>
+                    <FaUserPlus /> Sign Up
+                  </>
+                )}
+              </button>
+              <button 
+                onClick={handleLogin} 
+                disabled={isLoggingIn}
+                className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 inline-flex items-center gap-1 justify-center min-w-[80px]"
+              >
+                {isLoggingIn ? (
+                  <FaSpinner className="animate-spin" />
+                ) : (
+                  <>
+                    <FaSignInAlt /> Log In
+                  </>
+                )}
+              </button>
             </div>
           </div>
         )}
@@ -234,9 +299,19 @@ export default function Home() {
                   <p className="text-md font-semibold text-green-700 dark:text-green-400 mt-1">{hotel.price}</p>
                   {renderStars(hotel.rating)}
                 </div>
-                <Link href="/client/signup" className="block text-center w-full bg-green-600 text-white py-2 mt-4 rounded hover:bg-green-700">
-                  Book Now
-                </Link>
+                <button 
+                  onClick={handleBookNow} 
+                  disabled={isBooking}
+                  className="w-full bg-green-600 text-white py-2 mt-4 rounded hover:bg-green-700 flex items-center justify-center gap-2"
+                >
+                  {isBooking ? (
+                    <>
+                      <FaSpinner className="animate-spin" /> Processing...
+                    </>
+                  ) : (
+                    "Book Now"
+                  )}
+                </button>
               </div>
             </div>
           ))}
