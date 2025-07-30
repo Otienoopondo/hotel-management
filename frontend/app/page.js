@@ -120,7 +120,7 @@ export default function Home() {
 
   return (
     <main className={`min-h-screen flex flex-col ${darkMode ? "bg-gray-900 text-white" : "bg-gradient-to-b from-blue-50 via-gray-200 to-blue-100"}`}>
-      {/* Header */}
+      {/* Header - Kept exactly as before but ensured dark background */}
       <header className="bg-gray-800 py-4 shadow-md text-white">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
           {/* Logo + App Name */}
@@ -129,14 +129,14 @@ export default function Home() {
             <h1 className="text-xl sm:text-2xl font-bold text-blue-300 tracking-wide">Hotel Management System</h1>
           </div>
 
-          {/* Hamburger or Nav */}
+          {/* Hamburger for mobile only */}
           <div className="md:hidden">
             <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
           </div>
 
-          {/* Desktop Nav */}
+          {/* Desktop Nav - Kept exactly as before */}
           <nav className="hidden md:flex gap-5 items-center text-sm sm:text-base">
             <Link href="/" className="hover:text-yellow-300 inline-flex items-center gap-1"><FaHome /> Home</Link>
             <button onClick={() => setShowAbout(true)} className="hover:text-yellow-300 inline-flex items-center gap-1"><FaInfoCircle /> About</button>
@@ -252,14 +252,14 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Hotel Cards */}
+      {/* Hotel Cards - Only changed the background and text colors to match mobile */}
       <section className="flex-1 px-4 py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
         {hotels
           .filter((h) => h.name.toLowerCase().includes(query.toLowerCase()))
           .map((hotel, index) => (
             <div
               key={index}
-              className="bg-white/90 dark:bg-gray-700 backdrop-blur-md rounded-lg overflow-hidden shadow-lg transform transition hover:scale-105 flex flex-col"
+              className="bg-gray-800 text-white rounded-lg overflow-hidden shadow-lg transform transition hover:scale-105 flex flex-col"
               onMouseEnter={() =>
                 setHoverStates((prev) => {
                   const copy = [...prev];
@@ -294,9 +294,9 @@ export default function Home() {
               </div>
               <div className="p-4 flex flex-col flex-1 justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-blue-900 dark:text-white leading-snug mb-1">{hotel.name}</h3>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">{hotel.desc}</p>
-                  <p className="text-md font-semibold text-green-700 dark:text-green-400 mt-1">{hotel.price}</p>
+                  <h3 className="text-xl font-bold text-white leading-snug mb-1">{hotel.name}</h3>
+                  <p className="text-sm text-gray-300">{hotel.desc}</p>
+                  <p className="text-md font-semibold text-green-400 mt-1">{hotel.price}</p>
                   {renderStars(hotel.rating)}
                 </div>
                 <button 
