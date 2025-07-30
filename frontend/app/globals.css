@@ -27,6 +27,20 @@
   }
 }
 
+/* NEW: Force dark theme elements */
+.bg-gray-800 {
+  background-color: #1f2937 !important;
+}
+.text-white {
+  color: white !important;
+}
+.dark .bg-gray-800 {
+  background-color: #1f2937 !important;
+}
+.dark .text-white {
+  color: white !important;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
