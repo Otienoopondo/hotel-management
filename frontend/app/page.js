@@ -120,23 +120,20 @@ export default function Home() {
 
   return (
     <main className={`min-h-screen flex flex-col ${darkMode ? "bg-gray-900 text-white" : "bg-gradient-to-b from-blue-50 via-gray-200 to-blue-100"}`}>
-      {/* Header - Kept exactly as before but ensured dark background */}
-      <header className="bg-gray-800 py-4 shadow-md text-white">
+      {/* Header - Forced dark */}
+      <header className="!bg-gray-800 py-4 shadow-md text-white">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
-          {/* Logo + App Name */}
           <div className="flex items-center space-x-3">
             <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
             <h1 className="text-xl sm:text-2xl font-bold text-blue-300 tracking-wide">Hotel Management System</h1>
           </div>
 
-          {/* Hamburger for mobile only */}
           <div className="md:hidden">
             <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
           </div>
 
-          {/* Desktop Nav - Kept exactly as before */}
           <nav className="hidden md:flex gap-5 items-center text-sm sm:text-base">
             <Link href="/" className="hover:text-yellow-300 inline-flex items-center gap-1"><FaHome /> Home</Link>
             <button onClick={() => setShowAbout(true)} className="hover:text-yellow-300 inline-flex items-center gap-1"><FaInfoCircle /> About</button>
@@ -155,26 +152,14 @@ export default function Home() {
               disabled={isSigningUp}
               className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 inline-flex items-center gap-1 min-w-[90px] justify-center"
             >
-              {isSigningUp ? (
-                <FaSpinner className="animate-spin" />
-              ) : (
-                <>
-                  <FaUserPlus /> Sign Up
-                </>
-              )}
+              {isSigningUp ? <FaSpinner className="animate-spin" /> : <><FaUserPlus /> Sign Up</>}
             </button>
             <button 
               onClick={handleLogin} 
               disabled={isLoggingIn}
               className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 inline-flex items-center gap-1 min-w-[80px] justify-center"
             >
-              {isLoggingIn ? (
-                <FaSpinner className="animate-spin" />
-              ) : (
-                <>
-                  <FaSignInAlt /> Log In
-                </>
-              )}
+              {isLoggingIn ? <FaSpinner className="animate-spin" /> : <><FaSignInAlt /> Log In</>}
             </button>
             <button onClick={() => setDarkMode(!darkMode)} className="ml-2 px-2 py-1 bg-white text-black rounded hover:bg-yellow-300">
               {darkMode ? <FaSun /> : <FaMoon />}
@@ -182,7 +167,6 @@ export default function Home() {
           </nav>
         </div>
 
-        {/* Mobile Expanded Nav */}
         {mobileMenuOpen && (
           <div className="md:hidden px-4 pb-4 mt-2 flex flex-col gap-4">
             <div className="flex flex-col gap-2">
@@ -205,38 +189,24 @@ export default function Home() {
                 disabled={isSigningUp}
                 className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 inline-flex items-center gap-1 justify-center min-w-[90px]"
               >
-                {isSigningUp ? (
-                  <FaSpinner className="animate-spin" />
-                ) : (
-                  <>
-                    <FaUserPlus /> Sign Up
-                  </>
-                )}
+                {isSigningUp ? <FaSpinner className="animate-spin" /> : <><FaUserPlus /> Sign Up</>}
               </button>
               <button 
                 onClick={handleLogin} 
                 disabled={isLoggingIn}
                 className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 inline-flex items-center gap-1 justify-center min-w-[80px]"
               >
-                {isLoggingIn ? (
-                  <FaSpinner className="animate-spin" />
-                ) : (
-                  <>
-                    <FaSignInAlt /> Log In
-                  </>
-                )}
+                {isLoggingIn ? <FaSpinner className="animate-spin" /> : <><FaSignInAlt /> Log In</>}
               </button>
             </div>
           </div>
         )}
       </header>
 
-      {/* Floating Help Button */}
       <button className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 z-50" onClick={() => setShowHelp(true)}>
         <FaQuestionCircle size={24} />
       </button>
 
-      {/* Search */}
       <div className="px-6 pt-4">
         <div className="max-w-7xl mx-auto">
           <div className="relative">
@@ -252,14 +222,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Hotel Cards - Only changed the background and text colors to match mobile */}
       <section className="flex-1 px-4 py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
         {hotels
           .filter((h) => h.name.toLowerCase().includes(query.toLowerCase()))
           .map((hotel, index) => (
             <div
               key={index}
-              className="bg-gray-800 text-white rounded-lg overflow-hidden shadow-lg transform transition hover:scale-105 flex flex-col"
+              className="!bg-gray-800 !text-white rounded-lg overflow-hidden shadow-lg transform transition hover:scale-105 flex flex-col"
               onMouseEnter={() =>
                 setHoverStates((prev) => {
                   const copy = [...prev];
@@ -304,20 +273,13 @@ export default function Home() {
                   disabled={isBooking}
                   className="w-full bg-green-600 text-white py-2 mt-4 rounded hover:bg-green-700 flex items-center justify-center gap-2"
                 >
-                  {isBooking ? (
-                    <>
-                      <FaSpinner className="animate-spin" /> Processing...
-                    </>
-                  ) : (
-                    "Book Now"
-                  )}
+                  {isBooking ? <><FaSpinner className="animate-spin" /> Processing...</> : "Book Now"}
                 </button>
               </div>
             </div>
           ))}
       </section>
 
-      {/* Footer */}
       <footer className="bg-gray-800 py-6 text-white mt-10">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="mb-4 flex justify-center space-x-6 text-xl">
@@ -334,7 +296,6 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Modals */}
       {showAbout && <Modal title="About Our System" content="This Hotel Management System offers room booking, staff management, and client dashboards to enhance hospitality operations across multiple hotels." onClose={() => setShowAbout(false)} />}
       {showContact && <Modal title="Contact Us" content="Email: support@hotelbooking.co.ke | Phone: +254 740 547 264" onClose={() => setShowContact(false)} />}
       {showTerms && <Modal title="Terms of Use" content="By using this system, you agree to our terms including respectful conduct, proper usage of booking features, and acknowledgment of privacy responsibilities." onClose={() => setShowTerms(false)} />}
