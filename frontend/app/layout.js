@@ -1,6 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "react-hot-toast"; // ✅ Import toaster
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +19,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark"> {/* 1. Force dark mode at root */}
       <head>
         {/* Font Awesome CDN for social media icons */}
         <link
@@ -31,9 +31,17 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-800`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:!bg-gray-900 text-gray-800 dark:!text-white`} 
+        {/* 2. Added dark mode overrides */}
+        suppressHydrationWarning {/* 3. Prevents hydration mismatch warnings */}
       >
-        <Toaster position="top-right" toastOptions={{ duration: 3000 }} /> {/* ✅ Toast container */}
+        <Toaster 
+          position="top-right" 
+          toastOptions={{ 
+            duration: 3000,
+            className: '!bg-gray-800 !text-white' // Dark toasts
+          }} 
+        />
         {children}
       </body>
     </html>
