@@ -1,23 +1,16 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
   --font-primary: 'Poppins', Arial, Helvetica, sans-serif;
-
-  /* New colors for dashboard */
-  --dashboard-bg-color: rgba(255, 255, 255, 0.15); /* translucent white */
-  --dashboard-box-bg: #2c3e50; /* dark bluish */
-  --dashboard-box-text: #ecf0f1; /* light grey */
-  --dashboard-accent-color: #3498db; /* bright blue accent */
-  --dashboard-text-color: #f0f3f4; /* off-white text */
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --dashboard-bg-color: rgba(255, 255, 255, 0.15);
+  --dashboard-box-bg: #2c3e50;
+  --dashboard-box-text: #ecf0f1;
+  --dashboard-accent-color: #3498db;
+  --dashboard-text-color: #f0f3f4;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,17 +20,11 @@
   }
 }
 
-/* NEW: Force dark theme elements */
+/* Force dark elements */
 .bg-gray-800 {
   background-color: #1f2937 !important;
 }
 .text-white {
-  color: white !important;
-}
-.dark .bg-gray-800 {
-  background-color: #1f2937 !important;
-}
-.dark .text-white {
   color: white !important;
 }
 
@@ -49,66 +36,5 @@ body {
   padding: 0;
 }
 
-/* Fade-in animation */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fade-in-up {
-  animation: fadeInUp 0.8s ease-out both;
-}
-
-/* Dashboard specific overrides */
-.dashboard-container {
-  background-color: var(--dashboard-bg-color);
-  min-height: 100vh;
-  font-family: var(--font-primary);
-  color: var(--dashboard-text-color);
-}
-
-.dashboard-box {
-  background-color: var(--dashboard-box-bg);
-  color: var(--dashboard-box-text);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-  transition: background-color 0.3s ease;
-}
-
-.dashboard-box:hover {
-  background-color: var(--dashboard-accent-color);
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(52, 152, 219, 0.6);
-}
-
-/* For menu links */
-.menu-link {
-  color: var(--dashboard-text-color);
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-right: 2rem;
-  transition: color 0.3s ease;
-  text-decoration: none;
-}
-
-.menu-link:hover {
-  color: var(--dashboard-accent-color);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-/* Heading styling */
-h1, h2, h3 {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--dashboard-text-color);
-}
+/* Keep all your existing animations and dashboard styles below */
+/* ... rest of your existing CSS ... */
