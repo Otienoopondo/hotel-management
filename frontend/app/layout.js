@@ -19,9 +19,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="dark"> {/* 1. Force dark mode at root */}
+    <html lang="en" className="dark">
       <head>
-        {/* Font Awesome CDN for social media icons */}
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -31,15 +30,14 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:!bg-gray-900 text-gray-800 dark:!text-white`} 
-        {/* 2. Added dark mode overrides */}
-        suppressHydrationWarning {/* 3. Prevents hydration mismatch warnings */}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:!bg-gray-900 text-gray-800 dark:!text-white`}
+        suppressHydrationWarning
       >
         <Toaster 
           position="top-right" 
           toastOptions={{ 
             duration: 3000,
-            className: '!bg-gray-800 !text-white' // Dark toasts
+            className: '!bg-gray-800 !text-white'
           }} 
         />
         {children}
