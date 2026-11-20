@@ -297,10 +297,10 @@ export default function Home() {
       </footer>
 
       {showAbout && <Modal title="About Our System" content="This Hotel Management System offers room booking, staff management, and client dashboards to enhance hospitality operations across multiple hotels." onClose={() => setShowAbout(false)} />}
-      {showContact && <Modal title="Contact Us" content="Email: support@hotelbooking.co.ke | Phone: +254 740 547 264" onClose={() => setShowContact(false)} />}
+      {showContact && <Modal title="Contact Us" content="Email: support@hotelbooking.co.ke | Phone: +254 748 891 173." onClose={() => setShowContact(false)} />}
       {showTerms && <Modal title="Terms of Use" content="By using this system, you agree to our terms including respectful conduct, proper usage of booking features, and acknowledgment of privacy responsibilities." onClose={() => setShowTerms(false)} />}
       {showPrivacy && <Modal title="Privacy Policy" content="Your data is handled with strict confidentiality and never shared with third parties. We use secure methods to store and process your personal information." onClose={() => setShowPrivacy(false)} />}
-      {showHelp && <Modal title="Need Help?" content="Contact us at support@hotelbooking.co.ke or call +254 740 547 264." onClose={() => setShowHelp(false)} />}
+      {showHelp && <Modal title="Need Help?" content="Contact us at support@hotelbooking.co.ke or call +254 748 891 173." onClose={() => setShowHelp(false)} />}
     </main>
   );
 }
